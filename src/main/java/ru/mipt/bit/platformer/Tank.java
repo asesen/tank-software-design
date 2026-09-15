@@ -23,7 +23,7 @@ public class Tank {
         if (!hasReachedDestination()) {
             return;
         }
-        GridPoint2 nextCell = direction.neighbor(cell);
+        GridPoint2 nextCell = direction.addDirection(cell);
         if (!field.isOccupied(nextCell)) {
             destination.set(nextCell);
             movementProgress = 0f;

@@ -22,7 +22,7 @@ public enum Direction {
         return rotation;
     }
 
-    public GridPoint2 neighbor(GridPoint2 cell) {
+    public GridPoint2 addDirection(GridPoint2 cell) {
         return new GridPoint2(cell).add(deltaX, deltaY);
     }
 }
