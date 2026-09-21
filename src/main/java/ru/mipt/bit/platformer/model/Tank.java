@@ -1,9 +1,6 @@
-package ru.mipt.bit.platformer;
+package ru.mipt.bit.platformer.model;
 
 import com.badlogic.gdx.math.GridPoint2;
-
-import static com.badlogic.gdx.math.MathUtils.isEqual;
-import static ru.mipt.bit.platformer.util.GdxGameUtils.continueProgress;
 
 public class Tank {
 
@@ -38,8 +35,8 @@ public class Tank {
         }
     }
 
-    private boolean hasReachedDestination() {
-        return isEqual(movementProgress, 1f);
+    public boolean hasReachedDestination() {
+        return movementProgress >= 1f;
     }
 
     public GridPoint2 getCell() {
@@ -56,5 +53,20 @@ public class Tank {
 
     public float getRotation() {
         return direction.getRotation();
+    }
+
+    public Direction getDirection() {
+        return direction;
+    }
+
+    private static float continueProgress(float previousProgress, float deltaTime, float speed) {
+        float next = previousProgress + deltaTime / speed;
+        if (next < 0f) {
+            return 0f;
+        }
+        if (next > 1f) {
+            return 1f;
+        }
+        return next;
     }
 }
