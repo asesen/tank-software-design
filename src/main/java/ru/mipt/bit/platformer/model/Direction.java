@@ -1,4 +1,4 @@
-package ru.mipt.bit.platformer;
+package ru.mipt.bit.platformer.model;
 
 import com.badlogic.gdx.math.GridPoint2;
 
@@ -9,20 +9,22 @@ public enum Direction {
     RIGHT(0f, 1, 0);
 
     private final float rotation;
-    private final int deltaX;
-    private final int deltaY;
+    private final GridPoint2 vector;
 
     Direction(float rotation, int deltaX, int deltaY) {
         this.rotation = rotation;
-        this.deltaX = deltaX;
-        this.deltaY = deltaY;
+        this.vector = new GridPoint2(deltaX, deltaY);
     }
 
     public float getRotation() {
         return rotation;
     }
 
+    public GridPoint2 getVector() {
+        return new GridPoint2(vector);
+    }
+
     public GridPoint2 addDirection(GridPoint2 cell) {
-        return new GridPoint2(cell).add(deltaX, deltaY);
+        return new GridPoint2(cell).add(vector);
     }
 }
