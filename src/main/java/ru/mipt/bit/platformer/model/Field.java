@@ -7,24 +7,25 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class Field {
+public class Field implements Occupancy {
 
-    private final List<Tree> trees;
+    private final List<Obstacle> obstacles;
 
-    public Field(Tree... trees) {
-        this.trees = Collections.unmodifiableList(new ArrayList<Tree>(Arrays.asList(trees)));
+    public Field(Obstacle... obstacles) {
+        this.obstacles = Collections.unmodifiableList(new ArrayList<Obstacle>(Arrays.asList(obstacles)));
     }
 
+    @Override
     public boolean isOccupied(GridPoint2 cell) {
-        for (Tree tree : trees) {
-            if (tree.occupies(cell)) {
+        for (Obstacle obstacle : obstacles) {
+            if (obstacle.occupies(cell)) {
                 return true;
             }
         }
         return false;
     }
 
-    public List<Tree> getTrees() {
-        return trees;
+    public List<Obstacle> getObstacles() {
+        return obstacles;
     }
 }

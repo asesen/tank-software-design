@@ -2,7 +2,7 @@ package ru.mipt.bit.platformer.model;
 
 import com.badlogic.gdx.math.GridPoint2;
 
-public class Tree {
+public class Tree implements Obstacle {
 
     private final GridPoint2 cell;
 

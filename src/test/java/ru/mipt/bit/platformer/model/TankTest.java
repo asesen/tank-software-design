@@ -62,4 +62,14 @@ public class TankTest {
         assertTrue(tank.hasReachedDestination());
         assertEquals(new GridPoint2(2, 1), tank.getCell());
     }
+
+    @Test
+    public void movementDurationComesFromConstructor() {
+        Tank fastTank = new Tank(new GridPoint2(0, 0), 0.2f);
+        fastTank.tryMove(Direction.RIGHT, field);
+        fastTank.update(0.2f);
+
+        assertTrue(fastTank.hasReachedDestination());
+        assertEquals(new GridPoint2(1, 0), fastTank.getCell());
+    }
 }
