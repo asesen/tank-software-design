@@ -18,6 +18,20 @@ public class FieldTest {
         assertTrue(field.isOccupied(new GridPoint2(1, 3)));
         assertTrue(field.isOccupied(new GridPoint2(4, 2)));
         assertFalse(field.isOccupied(new GridPoint2(1, 1)));
-        assertEquals(2, field.getTrees().size());
+        assertEquals(2, field.getObstacles().size());
+    }
+
+    @Test
+    public void acceptsObstacleThatIsNotATree() {
+        Obstacle wall = new Obstacle() {
+            @Override
+            public boolean occupies(GridPoint2 cell) {
+                return cell.equals(new GridPoint2(2, 2));
+            }
+        };
+        Field field = new Field(wall);
+
+        assertTrue(field.isOccupied(new GridPoint2(2, 2)));
+        assertFalse(field.isOccupied(new GridPoint2(1, 1)));
     }
 }

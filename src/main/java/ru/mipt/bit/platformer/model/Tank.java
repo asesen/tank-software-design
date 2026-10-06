@@ -4,24 +4,30 @@ import com.badlogic.gdx.math.GridPoint2;
 
 public class Tank {
 
-    private static final float MOVEMENT_SPEED = 0.4f;
+    private static final float DEFAULT_MOVEMENT_SPEED = 0.4f;
 
     private final GridPoint2 cell;
     private final GridPoint2 destination;
+    private final float movementSpeed;
     private float movementProgress = 1f;
     private Direction direction = Direction.RIGHT;
 
     public Tank(GridPoint2 startCell) {
-        this.cell = new GridPoint2(startCell);
-        this.destination = new GridPoint2(startCell);
+        this(startCell, DEFAULT_MOVEMENT_SPEED);
     }
 
-    public void tryMove(Direction direction, Field field) {
+    public Tank(GridPoint2 startCell, float movementSpeed) {
+        this.cell = new GridPoint2(startCell);
+        this.destination = new GridPoint2(startCell);
+        this.movementSpeed = movementSpeed;
+    }
+
+    public void tryMove(Direction direction, Occupancy occupancy) {
         if (!hasReachedDestination()) {
             return;
         }
         GridPoint2 nextCell = direction.addDirection(cell);
-        if (!field.isOccupied(nextCell)) {
+        if (!occupancy.isOccupied(nextCell)) {
             destination.set(nextCell);
             movementProgress = 0f;
         }
@@ -29,7 +35,7 @@ public class Tank {
     }
 
     public void update(float deltaTime) {
-        movementProgress = continueProgress(movementProgress, deltaTime, MOVEMENT_SPEED);
+        movementProgress = continueProgress(movementProgress, deltaTime, movementSpeed);
         if (hasReachedDestination()) {
             cell.set(destination);
         }
