@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.Disposable;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
@@ -15,10 +15,10 @@ public class GameRenderer implements Disposable {
     private final LevelGraphics level;
     private final List<Renderable> renderables;
 
-    public GameRenderer(Batch batch, LevelGraphics level, Renderable... renderables) {
+    public GameRenderer(Batch batch, LevelGraphics level, List<Renderable> renderables) {
         this.batch = batch;
         this.level = level;
-        this.renderables = Arrays.asList(renderables);
+        this.renderables = new ArrayList<Renderable>(renderables);
     }
 
     public void sync() {

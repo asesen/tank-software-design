@@ -17,16 +17,28 @@ public class LevelGraphics implements Disposable {
     private final TiledMap tiledMap;
     private final MapRenderer mapRenderer;
     private final TileMovement tileMovement;
+    private final int width;
+    private final int height;
 
     public LevelGraphics(String mapPath, Batch batch) {
         this.tiledMap = new TmxMapLoader().load(mapPath);
         this.mapRenderer = createSingleLayerMapRenderer(tiledMap, batch);
         TiledMapTileLayer groundLayer = getSingleLayer(tiledMap);
         this.tileMovement = new TileMovement(groundLayer, Interpolation.smooth);
+        this.width = groundLayer.getWidth();
+        this.height = groundLayer.getHeight();
     }
 
     public TileMovement getTileMovement() {
         return tileMovement;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
     }
 
     public void render() {
