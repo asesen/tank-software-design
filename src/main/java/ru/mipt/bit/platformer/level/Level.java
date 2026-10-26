@@ -10,12 +10,24 @@ import java.util.List;
 
 public class Level {
 
+    private final int width;
+    private final int height;
     private final GridPoint2 playerStart;
     private final List<Tree> trees;
 
-    public Level(GridPoint2 playerStart, List<Tree> trees) {
+    public Level(int width, int height, GridPoint2 playerStart, List<Tree> trees) {
+        this.width = width;
+        this.height = height;
         this.playerStart = new GridPoint2(playerStart);
         this.trees = Collections.unmodifiableList(new ArrayList<Tree>(trees));
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
     }
 
     public GridPoint2 getPlayerStart() {

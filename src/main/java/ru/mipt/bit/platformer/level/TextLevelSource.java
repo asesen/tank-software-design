@@ -79,7 +79,7 @@ public class TextLevelSource implements LevelSource {
         if (playerStart == null) {
             throw new IllegalArgumentException("Level has no player start");
         }
-        return new Level(playerStart, trees);
+        return new Level(width, height, playerStart, trees);
     }
 
     private List<String> rows() {

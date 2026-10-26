@@ -65,6 +65,10 @@ public class Tank {
         return direction;
     }
 
+    public boolean occupies(GridPoint2 other) {
+        return cell.equals(other) || destination.equals(other);
+    }
+
     private static float continueProgress(float previousProgress, float deltaTime, float speed) {
         float next = previousProgress + deltaTime / speed;
         if (next < 0f) {

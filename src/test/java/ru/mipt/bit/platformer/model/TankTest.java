@@ -30,6 +30,9 @@ public class TankTest {
         assertEquals(new GridPoint2(1, 2), tank.getDestination());
         assertFalse(tank.hasReachedDestination());
         assertEquals(Direction.UP, tank.getDirection());
+        assertTrue(tank.occupies(new GridPoint2(1, 1)));
+        assertTrue(tank.occupies(new GridPoint2(1, 2)));
+        assertFalse(tank.occupies(new GridPoint2(2, 1)));
     }
 
     @Test

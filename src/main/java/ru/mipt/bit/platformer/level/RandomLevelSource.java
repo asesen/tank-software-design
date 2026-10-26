@@ -40,6 +40,6 @@ public class RandomLevelSource implements LevelSource {
         for (int i = 0; i < obstacleCount; i++) {
             trees.add(new Tree(cells.remove(0)));
         }
-        return new Level(playerStart, trees);
+        return new Level(width, height, playerStart, trees);
     }
 }
