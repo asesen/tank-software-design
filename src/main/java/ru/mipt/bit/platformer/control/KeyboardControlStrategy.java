@@ -12,10 +12,16 @@ public class KeyboardControlStrategy implements ControlStrategy {
 
     private final Keyboard keyboard;
     private final List<KeyDirectionBinding> bindings;
+    private final int shootKey;
 
     public KeyboardControlStrategy(Keyboard keyboard, List<KeyDirectionBinding> bindings) {
+        this(keyboard, bindings, -1);
+    }
+
+    public KeyboardControlStrategy(Keyboard keyboard, List<KeyDirectionBinding> bindings, int shootKey) {
         this.keyboard = keyboard;
         this.bindings = bindings;
+        this.shootKey = shootKey;
     }
 
     @Override
@@ -25,6 +31,9 @@ public class KeyboardControlStrategy implements ControlStrategy {
             if (binding.isPressed(keyboard)) {
                 commands.add(new MoveCommand(tank, binding.getDirection(), occupancy));
             }
+        }
+        if (shootKey >= 0 && keyboard.isPressed(shootKey)) {
+            commands.add(new ShootCommand(tank));
         }
         return new CompositeCommand(commands);
     }

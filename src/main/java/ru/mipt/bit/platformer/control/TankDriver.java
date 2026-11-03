@@ -15,8 +15,12 @@ public class TankDriver {
         this.occupancy = occupancy;
     }
 
+    public Command plan() {
+        return strategy.decide(tank, occupancy);
+    }
+
     public void act() {
-        strategy.decide(tank, occupancy).execute();
+        plan().execute();
     }
 
     public void update(float deltaTime) {
