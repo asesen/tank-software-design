@@ -7,14 +7,13 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.GridPoint2;
+import ru.mipt.bit.platformer.control.Command;
 import ru.mipt.bit.platformer.control.KeyboardControlStrategy;
 import ru.mipt.bit.platformer.control.RandomDirectionStrategy;
 import ru.mipt.bit.platformer.control.TankDriver;
 import ru.mipt.bit.platformer.graphics.GameRenderer;
 import ru.mipt.bit.platformer.graphics.LevelGraphics;
-import ru.mipt.bit.platformer.graphics.Renderable;
-import ru.mipt.bit.platformer.graphics.TankGraphics;
-import ru.mipt.bit.platformer.graphics.TreeGraphics;
+import ru.mipt.bit.platformer.model.Direction;
 import ru.mipt.bit.platformer.input.GdxKeyboard;
 import ru.mipt.bit.platformer.input.KeyDirectionBinding;
 import ru.mipt.bit.platformer.level.Level;
@@ -23,8 +22,7 @@ import ru.mipt.bit.platformer.level.RandomLevelSource;
 import ru.mipt.bit.platformer.level.RandomTankPlacement;
 import ru.mipt.bit.platformer.level.TextLevelSource;
 import ru.mipt.bit.platformer.model.AnyOccupancy;
-import ru.mipt.bit.platformer.model.Direction;
-import ru.mipt.bit.platformer.model.LevelBounds;
+import ru.mipt.bit.platformer.model.LogicalLevel;
 import ru.mipt.bit.platformer.model.Occupancy;
 import ru.mipt.bit.platformer.model.Tank;
 import ru.mipt.bit.platformer.model.TankOccupancy;
@@ -41,6 +39,7 @@ import static com.badlogic.gdx.Input.Keys.DOWN;
 import static com.badlogic.gdx.Input.Keys.LEFT;
 import static com.badlogic.gdx.Input.Keys.RIGHT;
 import static com.badlogic.gdx.Input.Keys.S;
+import static com.badlogic.gdx.Input.Keys.SPACE;
 import static com.badlogic.gdx.Input.Keys.UP;
 import static com.badlogic.gdx.Input.Keys.W;
 
@@ -56,6 +55,7 @@ public class GameDesktopLauncher implements ApplicationListener {
 
     private final String levelSourceName;
     private List<TankDriver> drivers;
+    private LogicalLevel world;
     private GameRenderer renderer;
 
     public GameDesktopLauncher(String levelSourceName) {
@@ -68,21 +68,16 @@ public class GameDesktopLauncher implements ApplicationListener {
         LevelGraphics levelGraphics = new LevelGraphics(LEVEL_MAP, batch);
         Level level = levelSource(levelGraphics.getWidth(), levelGraphics.getHeight()).load();
         List<Tank> tanks = createTanks(level);
-        Occupancy world = new AnyOccupancy(
-                level.toField(),
-                new LevelBounds(level.getWidth(), level.getHeight()),
-                new TankOccupancy(tanks)
-        );
-        drivers = createDrivers(tanks, world);
-
-        List<Renderable> renderables = new ArrayList<Renderable>();
-        for (Tank tank : tanks) {
-            renderables.add(new TankGraphics(tank, TANK_TEXTURE, levelGraphics.getTileMovement()));
-        }
+        world = new LogicalLevel(level.getWidth(), level.getHeight());
+        renderer = new GameRenderer(batch, levelGraphics, TANK_TEXTURE, TREE_TEXTURE);
+        world.addListener(renderer);
         for (Tree tree : level.getTrees()) {
-            renderables.add(new TreeGraphics(tree, TREE_TEXTURE, levelGraphics.getTileMovement()));
+            world.add(tree);
         }
-        renderer = new GameRenderer(batch, levelGraphics, renderables);
+        for (Tank tank : tanks) {
+            world.add(tank);
+        }
+        drivers = createDrivers(tanks, world);
     }
 
     private static List<Tank> createTanks(Level level) {
@@ -106,7 +101,7 @@ public class GameDesktopLauncher implements ApplicationListener {
                 new KeyDirectionBinding(Direction.LEFT, LEFT, A),
                 new KeyDirectionBinding(Direction.DOWN, DOWN, S),
                 new KeyDirectionBinding(Direction.RIGHT, RIGHT, D)
-        )), world));
+        ), SPACE), world));
         Random random = new Random();
         for (int i = 1; i < tanks.size(); i++) {
             drivers.add(new TankDriver(tanks.get(i), new RandomDirectionStrategy(random), world));
@@ -126,14 +121,14 @@ public class GameDesktopLauncher implements ApplicationListener {
 
     @Override
     public void render() {
+        List<Command> commands = new ArrayList<Command>();
         for (TankDriver driver : drivers) {
-            driver.act();
+            commands.add(driver.plan());
         }
-        renderer.sync();
-        float deltaTime = Gdx.graphics.getDeltaTime();
-        for (TankDriver driver : drivers) {
-            driver.update(deltaTime);
+        for (Command command : commands) {
+            command.execute();
         }
+        world.tick(Gdx.graphics.getDeltaTime());
         renderer.render();
     }
 

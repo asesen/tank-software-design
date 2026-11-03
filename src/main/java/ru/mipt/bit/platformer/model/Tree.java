@@ -2,7 +2,7 @@ package ru.mipt.bit.platformer.model;
 
 import com.badlogic.gdx.math.GridPoint2;
 
-public class Tree implements Obstacle {
+public class Tree implements Obstacle, LevelObject {
 
     private final GridPoint2 cell;
 
@@ -12,6 +12,10 @@ public class Tree implements Obstacle {
 
     public boolean occupies(GridPoint2 other) {
         return cell.equals(other);
+    }
+
+    @Override
+    public void live(float tick) {
     }
 
     public GridPoint2 getCell() {

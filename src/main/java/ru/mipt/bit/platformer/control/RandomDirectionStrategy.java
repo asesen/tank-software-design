@@ -17,7 +17,10 @@ public class RandomDirectionStrategy implements ControlStrategy {
     @Override
     public Command decide(Tank tank, Occupancy occupancy) {
         Direction[] directions = Direction.values();
-        Direction direction = directions[random.nextInt(directions.length)];
-        return new MoveCommand(tank, direction, occupancy);
+        int roll = random.nextInt(directions.length + 1);
+        if (roll == directions.length) {
+            return new ShootCommand(tank);
+        }
+        return new MoveCommand(tank, directions[roll], occupancy);
     }
 }
