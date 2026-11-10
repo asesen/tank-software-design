@@ -53,4 +53,14 @@ public class RandomTankPlacementTest {
         };
         new RandomTankPlacement(2, 2, 5, new Random(1)).place(blocked);
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void rejectsNonPositiveMapSize() {
+        new RandomTankPlacement(-1, 3, 1, new Random(1)).place(new Occupancy() {
+            @Override
+            public boolean isOccupied(GridPoint2 cell) {
+                return false;
+            }
+        });
+    }
 }
