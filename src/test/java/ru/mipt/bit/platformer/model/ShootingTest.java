@@ -31,7 +31,7 @@ public class ShootingTest {
     public void adjacentEnemyIsHitImmediately() {
         LogicalLevel level = new LogicalLevel(10, 8);
         Tank shooter = new Tank(new GridPoint2(1, 1));
-        Tank enemy = new Tank(new GridPoint2(2, 1));
+        Tank enemy = new Tank(new GridPoint2(2, 1), 0.4f, 1);
         level.add(shooter);
         level.add(enemy);
 
@@ -140,7 +140,7 @@ public class ShootingTest {
         tank.tryMove(Direction.LEFT, level);
         tank.shoot();
         level.tick(0f);
-        tank.takeDamage(Tank.BULLET_DAMAGE);
+        tank.takeDamage(tank.getHealth());
 
         assertEquals("add Tank", events.get(0));
         assertEquals("add Bullet", events.get(1));

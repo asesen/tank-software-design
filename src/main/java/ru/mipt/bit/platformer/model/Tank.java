@@ -2,9 +2,11 @@ package ru.mipt.bit.platformer.model;
 
 import com.badlogic.gdx.math.GridPoint2;
 
+import java.util.Random;
+
 public class Tank implements LevelObject {
 
-    public static final int DEFAULT_HEALTH = 1;
+    public static final int DEFAULT_HEALTH = 100;
     public static final int BULLET_DAMAGE = 1;
     public static final float BULLET_STEP_SECONDS = 0.2f;
     public static final float SHOOT_COOLDOWN = 0.25f;
@@ -16,7 +18,8 @@ public class Tank implements LevelObject {
     private final float movementSpeed;
     private float movementProgress = 1f;
     private Direction direction = Direction.RIGHT;
-    private int health = DEFAULT_HEALTH;
+    private int health;
+    private final int maxHealth;
     private float shootCooldown;
     private boolean alive = true;
     private LogicalLevel level;
@@ -26,9 +29,19 @@ public class Tank implements LevelObject {
     }
 
     public Tank(GridPoint2 startCell, float movementSpeed) {
+        this(startCell, movementSpeed, DEFAULT_HEALTH);
+    }
+
+    public Tank(GridPoint2 startCell, float movementSpeed, int health) {
         this.cell = new GridPoint2(startCell);
         this.destination = new GridPoint2(startCell);
         this.movementSpeed = movementSpeed;
+        this.health = health;
+        this.maxHealth = health;
+    }
+
+    public static int rollHealth(Random random) {
+        return 80 + random.nextInt(21);
     }
 
     public void tryMove(Direction direction, Occupancy occupancy) {
@@ -124,6 +137,10 @@ public class Tank implements LevelObject {
 
     public int getHealth() {
         return health;
+    }
+
+    public int getMaxHealth() {
+        return maxHealth;
     }
 
     public boolean isAlive() {

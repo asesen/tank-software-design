@@ -12,6 +12,7 @@ import ru.mipt.bit.platformer.control.KeyboardControlStrategy;
 import ru.mipt.bit.platformer.control.RandomDirectionStrategy;
 import ru.mipt.bit.platformer.control.TankDriver;
 import ru.mipt.bit.platformer.graphics.GameRenderer;
+import ru.mipt.bit.platformer.graphics.HealthDisplay;
 import ru.mipt.bit.platformer.graphics.LevelGraphics;
 import ru.mipt.bit.platformer.model.Direction;
 import ru.mipt.bit.platformer.input.GdxKeyboard;
@@ -36,6 +37,7 @@ import java.util.Random;
 import static com.badlogic.gdx.Input.Keys.A;
 import static com.badlogic.gdx.Input.Keys.D;
 import static com.badlogic.gdx.Input.Keys.DOWN;
+import static com.badlogic.gdx.Input.Keys.L;
 import static com.badlogic.gdx.Input.Keys.LEFT;
 import static com.badlogic.gdx.Input.Keys.RIGHT;
 import static com.badlogic.gdx.Input.Keys.S;
@@ -55,6 +57,7 @@ public class GameDesktopLauncher implements ApplicationListener {
 
     private final String levelSourceName;
     private List<TankDriver> drivers;
+    private HealthDisplay healthDisplay;
     private LogicalLevel world;
     private GameRenderer renderer;
 
@@ -68,8 +71,9 @@ public class GameDesktopLauncher implements ApplicationListener {
         LevelGraphics levelGraphics = new LevelGraphics(LEVEL_MAP, batch);
         Level level = levelSource(levelGraphics.getWidth(), levelGraphics.getHeight()).load();
         List<Tank> tanks = createTanks(level);
+        healthDisplay = new HealthDisplay();
         world = new LogicalLevel(level.getWidth(), level.getHeight());
-        renderer = new GameRenderer(batch, levelGraphics, TANK_TEXTURE, TREE_TEXTURE);
+        renderer = new GameRenderer(batch, levelGraphics, TANK_TEXTURE, TREE_TEXTURE, healthDisplay);
         world.addListener(renderer);
         for (Tree tree : level.getTrees()) {
             world.add(tree);
@@ -77,31 +81,32 @@ public class GameDesktopLauncher implements ApplicationListener {
         for (Tank tank : tanks) {
             world.add(tank);
         }
-        drivers = createDrivers(tanks, world);
+        drivers = createDrivers(tanks, world, healthDisplay);
     }
 
     private static List<Tank> createTanks(Level level) {
         List<Tank> tanks = new ArrayList<Tank>();
-        Tank player = new Tank(level.getPlayerStart(), MOVEMENT_SPEED);
+        Random random = new Random();
+        Tank player = new Tank(level.getPlayerStart(), MOVEMENT_SPEED, Tank.rollHealth(random));
         tanks.add(player);
         Occupancy blocked = new AnyOccupancy(level.toField(), new TankOccupancy(tanks));
         List<GridPoint2> aiCells = new RandomTankPlacement(
                 level.getWidth(), level.getHeight(), AI_TANK_COUNT, new Random()
         ).place(blocked);
         for (GridPoint2 cell : aiCells) {
-            tanks.add(new Tank(cell, MOVEMENT_SPEED));
+            tanks.add(new Tank(cell, MOVEMENT_SPEED, Tank.rollHealth(random)));
         }
         return tanks;
     }
 
-    private static List<TankDriver> createDrivers(List<Tank> tanks, Occupancy world) {
+    private static List<TankDriver> createDrivers(List<Tank> tanks, Occupancy world, HealthDisplay healthDisplay) {
         List<TankDriver> drivers = new ArrayList<TankDriver>();
         drivers.add(new TankDriver(tanks.get(0), new KeyboardControlStrategy(new GdxKeyboard(), Arrays.asList(
                 new KeyDirectionBinding(Direction.UP, UP, W),
                 new KeyDirectionBinding(Direction.LEFT, LEFT, A),
                 new KeyDirectionBinding(Direction.DOWN, DOWN, S),
                 new KeyDirectionBinding(Direction.RIGHT, RIGHT, D)
-        ), SPACE), world));
+        ), SPACE, L, healthDisplay), world));
         Random random = new Random();
         for (int i = 1; i < tanks.size(); i++) {
             drivers.add(new TankDriver(tanks.get(i), new RandomDirectionStrategy(random), world));

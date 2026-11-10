@@ -22,14 +22,16 @@ public class GameRenderer implements LevelListener, Disposable {
     private final LevelGraphics level;
     private final String tankTexture;
     private final String treeTexture;
+    private final HealthDisplay healthDisplay;
     private final Map<LevelObject, Renderable> views = new IdentityHashMap<LevelObject, Renderable>();
     private final List<LevelObject> drawOrder = new ArrayList<LevelObject>();
 
-    public GameRenderer(Batch batch, LevelGraphics level, String tankTexture, String treeTexture) {
+    public GameRenderer(Batch batch, LevelGraphics level, String tankTexture, String treeTexture, HealthDisplay healthDisplay) {
         this.batch = batch;
         this.level = level;
         this.tankTexture = tankTexture;
         this.treeTexture = treeTexture;
+        this.healthDisplay = healthDisplay;
     }
 
     @Override
@@ -78,7 +80,13 @@ public class GameRenderer implements LevelListener, Disposable {
 
     private Renderable createView(LevelObject object) {
         if (object instanceof Tank) {
-            return new TankGraphics((Tank) object, tankTexture, level.getTileMovement());
+            Tank tank = (Tank) object;
+            return new HealthBarDecorator(
+                    new TankGraphics(tank, tankTexture, level.getTileMovement()),
+                    tank,
+                    level.getTileMovement(),
+                    healthDisplay
+            );
         }
         if (object instanceof Tree) {
             return new TreeGraphics((Tree) object, treeTexture, level.getTileMovement());
