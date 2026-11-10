@@ -3,11 +3,8 @@ package ru.mipt.bit.platformer.graphics;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.Disposable;
-import ru.mipt.bit.platformer.model.Bullet;
 import ru.mipt.bit.platformer.model.LevelListener;
 import ru.mipt.bit.platformer.model.LevelObject;
-import ru.mipt.bit.platformer.model.Tank;
-import ru.mipt.bit.platformer.model.Tree;
 
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
@@ -20,26 +17,29 @@ public class GameRenderer implements LevelListener, Disposable {
 
     private final Batch batch;
     private final LevelGraphics level;
-    private final String tankTexture;
-    private final String treeTexture;
-    private final HealthDisplay healthDisplay;
+    private final List<RenderableFactory> factories;
     private final Map<LevelObject, Renderable> views = new IdentityHashMap<LevelObject, Renderable>();
     private final List<LevelObject> drawOrder = new ArrayList<LevelObject>();
 
-    public GameRenderer(Batch batch, LevelGraphics level, String tankTexture, String treeTexture, HealthDisplay healthDisplay) {
+    public GameRenderer(Batch batch, LevelGraphics level, List<RenderableFactory> factories) {
         this.batch = batch;
         this.level = level;
-        this.tankTexture = tankTexture;
-        this.treeTexture = treeTexture;
-        this.healthDisplay = healthDisplay;
+        this.factories = new ArrayList<RenderableFactory>(factories);
+    }
+
+    static Renderable createView(LevelObject object, List<RenderableFactory> factories) {
+        for (RenderableFactory factory : factories) {
+            Renderable view = factory.create(object);
+            if (view != null) {
+                return view;
+            }
+        }
+        throw new IllegalArgumentException("No graphics for " + object.getClass().getSimpleName());
     }
 
     @Override
     public void objectAdded(LevelObject object) {
-        Renderable view = createView(object);
-        if (view == null) {
-            return;
-        }
+        Renderable view = createView(object, factories);
         views.put(object, view);
         drawOrder.add(object);
     }
@@ -76,24 +76,5 @@ public class GameRenderer implements LevelListener, Disposable {
         drawOrder.clear();
         level.dispose();
         batch.dispose();
-    }
-
-    private Renderable createView(LevelObject object) {
-        if (object instanceof Tank) {
-            Tank tank = (Tank) object;
-            return new HealthBarDecorator(
-                    new TankGraphics(tank, tankTexture, level.getTileMovement()),
-                    tank,
-                    level.getTileMovement(),
-                    healthDisplay
-            );
-        }
-        if (object instanceof Tree) {
-            return new TreeGraphics((Tree) object, treeTexture, level.getTileMovement());
-        }
-        if (object instanceof Bullet) {
-            return new BulletGraphics((Bullet) object, level.getTileMovement());
-        }
-        return null;
     }
 }

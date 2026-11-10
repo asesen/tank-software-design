@@ -11,9 +11,13 @@ import ru.mipt.bit.platformer.control.Command;
 import ru.mipt.bit.platformer.control.KeyboardControlStrategy;
 import ru.mipt.bit.platformer.control.RandomDirectionStrategy;
 import ru.mipt.bit.platformer.control.TankDriver;
+import ru.mipt.bit.platformer.graphics.BulletRenderableFactory;
 import ru.mipt.bit.platformer.graphics.GameRenderer;
 import ru.mipt.bit.platformer.graphics.HealthDisplay;
 import ru.mipt.bit.platformer.graphics.LevelGraphics;
+import ru.mipt.bit.platformer.graphics.RenderableFactory;
+import ru.mipt.bit.platformer.graphics.TankRenderableFactory;
+import ru.mipt.bit.platformer.graphics.TreeRenderableFactory;
 import ru.mipt.bit.platformer.model.Direction;
 import ru.mipt.bit.platformer.input.GdxKeyboard;
 import ru.mipt.bit.platformer.input.KeyDirectionBinding;
@@ -73,7 +77,11 @@ public class GameDesktopLauncher implements ApplicationListener {
         List<Tank> tanks = createTanks(level);
         healthDisplay = new HealthDisplay();
         world = new LogicalLevel(level.getWidth(), level.getHeight());
-        renderer = new GameRenderer(batch, levelGraphics, TANK_TEXTURE, TREE_TEXTURE, healthDisplay);
+        renderer = new GameRenderer(batch, levelGraphics, Arrays.asList(
+                new TankRenderableFactory(TANK_TEXTURE, levelGraphics.getTileMovement(), healthDisplay),
+                new TreeRenderableFactory(TREE_TEXTURE, levelGraphics.getTileMovement()),
+                new BulletRenderableFactory(levelGraphics.getTileMovement())
+        ));
         world.addListener(renderer);
         for (Tree tree : level.getTrees()) {
             world.add(tree);
