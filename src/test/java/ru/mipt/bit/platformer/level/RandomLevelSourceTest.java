@@ -36,4 +36,9 @@ public class RandomLevelSourceTest {
         assertEquals(first.getPlayerStart(), second.getPlayerStart());
         assertEquals(first.getTrees().get(0).getCell(), second.getTrees().get(0).getCell());
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void rejectsNonPositiveMapSize() {
+        new RandomLevelSource(0, 8, 1, new Random(1)).load();
+    }
 }

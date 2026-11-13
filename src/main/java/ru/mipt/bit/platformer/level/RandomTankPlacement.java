@@ -23,6 +23,9 @@ public class RandomTankPlacement {
     }
 
     public List<GridPoint2> place(Occupancy blocked) {
+        if (width <= 0 || height <= 0) {
+            throw new IllegalArgumentException("Map size must be positive");
+        }
         List<GridPoint2> freeCells = new ArrayList<GridPoint2>();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {

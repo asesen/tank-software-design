@@ -24,6 +24,9 @@ public class RandomLevelSource implements LevelSource {
 
     @Override
     public Level load() {
+        if (width <= 0 || height <= 0) {
+            throw new IllegalArgumentException("Map size must be positive");
+        }
         int cellCount = width * height;
         if (obstacleCount < 0 || obstacleCount >= cellCount) {
             throw new IllegalArgumentException("Obstacle count must leave a free cell for the player");

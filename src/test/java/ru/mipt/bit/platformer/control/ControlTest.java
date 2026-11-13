@@ -2,6 +2,7 @@ package ru.mipt.bit.platformer.control;
 
 import com.badlogic.gdx.math.GridPoint2;
 import org.junit.Test;
+import ru.mipt.bit.platformer.graphics.HealthDisplay;
 import ru.mipt.bit.platformer.input.FakeKeyboard;
 import ru.mipt.bit.platformer.input.KeyDirectionBinding;
 import ru.mipt.bit.platformer.model.Bullet;
@@ -17,11 +18,13 @@ import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class ControlTest {
 
     private static final int UP_KEY = 1;
     private static final int SPACE_KEY = 2;
+    private static final int HEALTH_KEY = 3;
 
     private final Occupancy openMap = new LevelBounds(10, 8);
 
@@ -121,6 +124,26 @@ public class ControlTest {
 
         assertEquals(1, bullets(level));
         assertEquals(new GridPoint2(2, 1), bulletCell(level));
+    }
+
+    @Test
+    public void healthKeyTogglesOnceWhileHeld() {
+        HealthDisplay display = new HealthDisplay();
+        FakeKeyboard keyboard = new FakeKeyboard();
+        keyboard.press(HEALTH_KEY);
+        KeyboardControlStrategy strategy = new KeyboardControlStrategy(
+                keyboard,
+                Arrays.asList(new KeyDirectionBinding(Direction.UP, UP_KEY)),
+                -1,
+                HEALTH_KEY,
+                display
+        );
+        Tank tank = new Tank(new GridPoint2(1, 1));
+
+        strategy.decide(tank, openMap).execute();
+        strategy.decide(tank, openMap).execute();
+
+        assertTrue(display.isVisible());
     }
 
     private static int bullets(LogicalLevel level) {
