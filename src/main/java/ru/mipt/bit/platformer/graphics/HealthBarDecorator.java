@@ -1,5 +1,6 @@
 package ru.mipt.bit.platformer.graphics;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -43,12 +44,16 @@ public class HealthBarDecorator implements Renderable {
         float x = marker.x + marker.width / 2f - BAR_WIDTH / 2f;
         float y = marker.y + marker.height / 2f + BAR_OFFSET_Y;
         float filled = BAR_WIDTH * tank.getHealth() / (float) tank.getMaxHealth();
-        Texture texture = pixel();
-        batch.setColor(0.15f, 0.15f, 0.15f, 1f);
-        batch.draw(texture, x, y, BAR_WIDTH, BAR_HEIGHT);
-        batch.setColor(0.2f, 0.75f, 0.25f, 1f);
-        batch.draw(texture, x, y, Math.max(0f, filled), BAR_HEIGHT);
-        batch.setColor(1f, 1f, 1f, 1f);
+        Color previous = batch.getColor().cpy();
+        try {
+            Texture texture = pixel();
+            batch.setColor(0.15f, 0.15f, 0.15f, 1f);
+            batch.draw(texture, x, y, BAR_WIDTH, BAR_HEIGHT);
+            batch.setColor(0.2f, 0.75f, 0.25f, 1f);
+            batch.draw(texture, x, y, Math.max(0f, filled), BAR_HEIGHT);
+        } finally {
+            batch.setColor(previous);
+        }
     }
 
     @Override
