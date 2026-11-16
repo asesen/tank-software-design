@@ -23,6 +23,7 @@ public class Tank implements LevelObject {
     private float shootCooldown;
     private boolean alive = true;
     private LogicalLevel level;
+    private TankState state;
 
     public Tank(GridPoint2 startCell) {
         this(startCell, DEFAULT_MOVEMENT_SPEED);
@@ -38,6 +39,7 @@ public class Tank implements LevelObject {
         this.movementSpeed = movementSpeed;
         this.health = health;
         this.maxHealth = health;
+        this.state = TankState.forHealth(health, maxHealth);
     }
 
     public static int rollHealth(Random random) {
@@ -57,10 +59,10 @@ public class Tank implements LevelObject {
     }
 
     public void shoot() {
-        if (!alive || level == null || shootCooldown > 0f) {
+        if (!alive || level == null || shootCooldown > 0f || !state.canShoot()) {
             return;
         }
-        shootCooldown = SHOOT_COOLDOWN;
+        shootCooldown = SHOOT_COOLDOWN * state.shootCooldownFactor();
         Bullet bullet = new Bullet(
                 direction.addDirection(cell),
                 direction,
@@ -81,11 +83,14 @@ public class Tank implements LevelObject {
             if (level != null) {
                 level.remove(this);
             }
+            return;
         }
+        state = TankState.forHealth(health, maxHealth);
     }
 
     public void update(float deltaTime) {
-        movementProgress = continueProgress(movementProgress, deltaTime, movementSpeed);
+        movementProgress = continueProgress(
+                movementProgress, deltaTime, movementSpeed * state.movementDurationFactor());
         if (hasReachedDestination()) {
             cell.set(destination);
         }
@@ -141,6 +146,14 @@ public class Tank implements LevelObject {
 
     public int getMaxHealth() {
         return maxHealth;
+    }
+
+    public TankState getState() {
+        return state;
+    }
+
+        public void setState(TankState state) {
+        this.state = state;
     }
 
     public boolean isAlive() {
